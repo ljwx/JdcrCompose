@@ -42,7 +42,7 @@ dependencies {
     api(libs.androidx.compose.runtime)
 
     api(libs.androidx.navigation3.runtime)
-    implementation(libs.androidx.navigation3.ui)
+    api(libs.androidx.navigation3.ui)
 
     api(libs.androidx.savedstate)
     api(libs.kotlinx.serialization.core)

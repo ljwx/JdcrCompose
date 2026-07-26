@@ -1,3 +1,32 @@
 <resources>
-    <string name="app_name">JdcrCompose</string>
+    <string name="app_name">JDCR Market</string>
+    <string name="brand_name">JDCR</string>
+    <string name="brand_tagline">MARKET</string>
+    <string name="splash_loading">正在准备精选商品</string>
+    <string name="splash_failed">初始化失败</string>
+    <string name="retry">重试</string>
+    <string name="collection_label">CURATED GOODS</string>
+    <string name="product_list_title">精选商品</string>
+    <string name="product_list_subtitle">简洁、耐用，适合每天使用</string>
+    <string name="product_count">共 %1$d 件</string>
+    <string name="active_login">主动登录</string>
+    <string name="logout">退出登录</string>
+    <string name="product_price">¥%1$d</string>
+    <string name="product_rating">%1$.1f 分</string>
+    <string name="product_detail">商品详情</string>
+    <string name="product_not_found">商品不存在</string>
+    <string name="back">返回</string>
+    <string name="detail_service">顺丰包邮 · 7 天无理由退换</string>
+    <string name="expire_session">模拟登录失效</string>
+    <string name="login_eyebrow">ACCOUNT ACCESS</string>
+    <string name="login_title">账号登录</string>
+    <string name="login_for_protected_route">登录后继续查看商品详情</string>
+    <string name="login_for_session_expired">会话已过期，请重新登录</string>
+    <string name="login_default_message">登录以继续使用 JDCR Market</string>
+    <string name="account">账号</string>
+    <string name="password">密码</string>
+    <string name="show_password">显示密码</string>
+    <string name="login">登录</string>
+    <string name="logging_in">正在登录</string>
+    <string name="leave_login">暂不登录</string>
 </resources>

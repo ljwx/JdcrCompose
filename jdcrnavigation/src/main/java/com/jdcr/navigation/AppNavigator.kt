@@ -1,11 +1,11 @@
-package com.jdcr.jdcrcompose.navigation
+package com.jdcr.navigation
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
-import com.jdcr.jdcrcompose.navigation.interceptor.NavigationInterceptor
-import com.jdcr.jdcrcompose.navigation.route.BaseAppRoute
+import com.jdcr.navigation.interceptor.NavigationInterceptor
+import com.jdcr.navigation.route.BaseAppRoute
 
 @Stable
 interface AppNavigator {

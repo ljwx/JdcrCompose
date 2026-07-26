@@ -1,6 +1,6 @@
-package com.jdcr.jdcrcompose.navigation.command
+package com.jdcr.navigation.command
 
-import com.jdcr.jdcrcompose.navigation.route.BaseAppRoute
+import com.jdcr.navigation.route.BaseAppRoute
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 

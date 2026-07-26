@@ -3,16 +3,16 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    `maven-publish`
 }
 
 android {
-    namespace = "com.jdcr.jdcrcompose"
+    namespace = "com.jdcr.navigation"
     compileSdk = 36
 
     defaultConfig {
         minSdk = 24
 
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
 
@@ -39,16 +39,31 @@ kotlin {
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
     api(libs.androidx.compose.runtime)
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.material3)
+
     api(libs.androidx.navigation3.runtime)
-    api(libs.androidx.navigation3.ui)
-    // 暂时不用 ViewModel decorator 就先别加
-    // implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.navigation3.ui)
+
+    api(libs.androidx.savedstate)
     api(libs.kotlinx.serialization.core)
-    implementation(libs.kotlinx.serialization.json)
     api(libs.kotlinx.coroutines.core)
+
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+
+                groupId = "com.github.jdcr"
+                artifactId = "jdcrnavigation"
+                version = "1.0.0-SNAPSHOT"
+            }
+        }
+    }
 }

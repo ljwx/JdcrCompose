@@ -1,16 +1,18 @@
 [versions]
 agp = "8.9.1"
 kotlin = "2.2.20"
-composeBom = "2025.02.00"
-navigation3 = "1.1.0"
+composeBom = "2025.11.01"
+composeRuntime = "1.9.5"
+navigation3 = "1.0.1"
 lifecycle = "2.10.0"
-activity = "1.10.1"
-kotlinxSerialization = "1.9.0"
-kotlinxCoroutines = "1.10.2"
+savedstate = "1.4.0"
+activity = "1.12.0"
+kotlinxSerialization = "1.7.3"
+kotlinxCoroutines = "1.9.0"
 
 [libraries]
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
-androidx-compose-runtime = { module = "androidx.compose.runtime:runtime" }
+androidx-compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "composeRuntime" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
@@ -18,11 +20,14 @@ androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+androidx-savedstate = { module = "androidx.savedstate:savedstate", version.ref = "savedstate" }
+androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 
 [plugins]

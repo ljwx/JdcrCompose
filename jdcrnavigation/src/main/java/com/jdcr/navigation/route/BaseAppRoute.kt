@@ -1,7 +1,7 @@
-package com.jdcr.jdcrcompose.navigation.route
+package com.jdcr.navigation.route
 
 import androidx.navigation3.runtime.NavKey
 
-interface LoginRequired
+interface RequiresLogin
 
 interface BaseAppRoute : NavKey

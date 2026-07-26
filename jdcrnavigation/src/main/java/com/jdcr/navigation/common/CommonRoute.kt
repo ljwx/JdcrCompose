@@ -1,7 +1,9 @@
-package com.jdcr.jdcrcompose.navigation.common
+package com.jdcr.navigation.common
 
 import androidx.navigation3.runtime.NavKey
-import com.jdcr.jdcrcompose.navigation.route.BaseAppRoute
+import com.jdcr.navigation.common.auth.LoginOptions
+import com.jdcr.navigation.route.BaseAppRoute
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -13,10 +15,11 @@ sealed interface CommonRoute : BaseAppRoute {
     object Splash : CommonRoute
 
     @Serializable
-    data class HomeMain(val data: String? = null) : CommonRoute
-
-    @Serializable
-    data class LoginMain(val data: String? = null) : CommonRoute
+    data class Login(
+        @Polymorphic
+        val returnTo: NavKey? = null,
+        val options: LoginOptions = LoginOptions(),
+    ) : CommonRoute
 
 }
 
@@ -27,12 +30,8 @@ val commonRouteSerializersModule = SerializersModule {
             CommonRoute.Splash.serializer(),
         )
         subclass(
-            CommonRoute.HomeMain::class,
-            CommonRoute.HomeMain.serializer(),
-        )
-        subclass(
-            CommonRoute.LoginMain::class,
-            CommonRoute.LoginMain.serializer(),
+            CommonRoute.Login::class,
+            CommonRoute.Login.serializer(),
         )
     }
 }

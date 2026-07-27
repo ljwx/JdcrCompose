@@ -14,6 +14,8 @@ import com.jdcr.jdcrcompose.ui.screen.ProductDetailScreen
 import com.jdcr.jdcrcompose.ui.screen.ProductListScreen
 import com.jdcr.jdcrcompose.ui.screen.SplashScreen
 import com.jdcr.navigation.AppNavHost
+import com.jdcr.navigation.AppNavAnimation
+import com.jdcr.navigation.AppNavTransitionPolicy
 import com.jdcr.navigation.common.CommonPages
 import com.jdcr.navigation.common.CommonRoute
 import com.jdcr.navigation.common.auth.AuthSessionState
@@ -55,6 +57,19 @@ fun DemoApp(
             },
         )
     }
+    val transitionPolicy = remember {
+        AppNavTransitionPolicy { fromRoute, toRoute ->
+            when {
+                fromRoute is CommonRoute.Splash || toRoute is CommonRoute.Splash ->
+                    AppNavAnimation.None
+
+                fromRoute is CommonRoute.Login || toRoute is CommonRoute.Login ->
+                    AppNavAnimation.Fade()
+
+                else -> AppNavAnimation.Slide()
+            }
+        }
+    }
 
     AppNavHost(
         startRoute = CommonRoute.Splash,
@@ -74,6 +89,7 @@ fun DemoApp(
                 onRetry = {},
             )
         },
+        transitionPolicy = transitionPolicy,
     ) { navigator ->
         installCommonPages(
             navigator = navigator,

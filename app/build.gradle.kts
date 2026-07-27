@@ -19,7 +19,19 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("jdcrDebug") {
+            storeFile = file("jdcr_test.keystore")
+            storePassword = "jdcr123456"
+            keyAlias = "jdcr"
+            keyPassword = "jdcr123456"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("jdcrDebug")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(

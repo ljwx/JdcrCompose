@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberDecoratedNavEntries
@@ -69,6 +70,7 @@ fun AppNavHost(
     predictivePopTransitionSpec: AppNavPredictivePopTransitionSpec = { _ ->
         popTransitionSpec(this)
     },
+    transitionPolicy: AppNavTransitionPolicy? = null,
     destinations: DestinationRegistry,
 ) {
 
@@ -120,8 +122,13 @@ fun AppNavHost(
         )
 
         val provider = remember(destinations, navigator) {
-            entryProvider<NavKey> {
+            val destinationProvider = entryProvider<NavKey> {
                 destinations(navigator)
+            }
+            return@remember { key: NavKey ->
+                val entry = destinationProvider(key)
+                val route = key as? BaseAppRoute
+                if (route == null) entry else entry.withRouteMetadata(route)
             }
         }
 
@@ -132,12 +139,28 @@ fun AppNavHost(
         )
         when (guardResult) {
             BackStackGuardResult.Allow -> {
+                val policyTransitionSpec: AppNavTransitionSpec = {
+                    resolveAnimation(transitionPolicy)?.let { animation ->
+                        contentTransform(animation, isPop = false)
+                    } ?: transitionSpec(this)
+                }
+                val policyPopTransitionSpec: AppNavTransitionSpec = {
+                    resolveAnimation(transitionPolicy)?.let { animation ->
+                        contentTransform(animation, isPop = true)
+                    } ?: popTransitionSpec(this)
+                }
+                val policyPredictivePopTransitionSpec: AppNavPredictivePopTransitionSpec =
+                    { swipeEdge ->
+                        resolveAnimation(transitionPolicy)?.let { animation ->
+                            contentTransform(animation, isPop = true)
+                        } ?: predictivePopTransitionSpec(this, swipeEdge)
+                    }
                 NavDisplay(
                     entries = entries,
                     onBack = navigator::back,
-                    transitionSpec = transitionSpec,
-                    popTransitionSpec = popTransitionSpec,
-                    predictivePopTransitionSpec = predictivePopTransitionSpec,
+                    transitionSpec = policyTransitionSpec,
+                    popTransitionSpec = policyPopTransitionSpec,
+                    predictivePopTransitionSpec = policyPredictivePopTransitionSpec,
                 )
             }
 
@@ -160,3 +183,30 @@ sealed interface BackStackGuardResult {
 }
 
 typealias BackStackGuard = (backStack: List<NavKey>) -> BackStackGuardResult
+
+private const val ROUTE_METADATA_KEY = "com.jdcr.navigation.route"
+
+private fun NavEntry<NavKey>.withRouteMetadata(route: BaseAppRoute): NavEntry<NavKey> {
+    val originalEntry = this
+    return NavEntry(
+        key = route,
+        contentKey = contentKey,
+        metadata = metadata + (ROUTE_METADATA_KEY to route),
+    ) {
+        originalEntry.Content()
+    }
+}
+
+private fun AnimatedContentTransitionScope<Scene<NavKey>>.resolveAnimation(
+    policy: AppNavTransitionPolicy?,
+): AppNavAnimation? {
+    if (policy == null) return null
+    val fromRoute = initialState.route ?: return null
+    val toRoute = targetState.route ?: return null
+    return policy.resolve(fromRoute, toRoute)
+}
+
+private val Scene<NavKey>.route: BaseAppRoute?
+    get() = entries.lastOrNull()
+        ?.metadata
+        ?.get(ROUTE_METADATA_KEY) as? BaseAppRoute

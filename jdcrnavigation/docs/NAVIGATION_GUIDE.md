@@ -417,6 +417,61 @@ fun AppRoot(
 - `navigator` 执行统一导航。
 - `installCommonPages()` 安装库提供的公共流程。
 
+### 6.1 使用类型安全的统一转场策略
+
+当不同路由需要不同动画时，在 `AppNavHost` 调用处集中声明
+`AppNavTransitionPolicy`。策略收到的是真实 `BaseAppRoute`，可以直接使用
+Kotlin 类型判断，不要读取 `Scene.key` 或比较 `route.toString()`：
+
+```kotlin
+val transitionPolicy = remember {
+    AppNavTransitionPolicy { fromRoute, toRoute ->
+        when {
+            fromRoute is CommonRoute.Splash || toRoute is CommonRoute.Splash ->
+                AppNavAnimation.None
+
+            fromRoute is CommonRoute.Login || toRoute is CommonRoute.Login ->
+                AppNavAnimation.Fade()
+
+            fromRoute is AppRoute.Home && toRoute is AppRoute.ArticleDetail ->
+                AppNavAnimation.Slide(
+                    forwardDirection = AppNavSlideDirection.Left,
+                    durationMillis = 300,
+                )
+
+            else -> AppNavAnimation.Slide()
+        }
+    }
+}
+
+AppNavHost(
+    // 其他参数省略
+    transitionPolicy = transitionPolicy,
+) { navigator ->
+    // 注册页面
+}
+```
+
+库提供三种可复用动画：
+
+| 动画 | 行为 |
+| --- | --- |
+| `AppNavAnimation.Slide` | 前进时使用配置方向，普通返回和预测返回时自动反向 |
+| `AppNavAnimation.Fade` | 分别配置进入和退出时长 |
+| `AppNavAnimation.None` | 不执行转场动画，适合启动页切换等场景 |
+
+`AppNavHost` 会在创建 `NavEntry` 时把真实 route 写入内部 metadata，因此该策略对
+普通导航、返回以及进程恢复后继续导航都保持类型安全。动画选择的优先级为：
+
+1. 页面通过 Navigation 3 metadata 显式提供的动画。
+2. `transitionPolicy` 返回的统一动画。
+3. `transitionSpec`、`popTransitionSpec` 和
+   `predictivePopTransitionSpec` 提供的底层默认动画。
+
+通常业务 App 只需要使用统一策略。只有 Compose 内置动画无法表达需求时，才直接配置
+底层 transition spec。Compose 可能在同一次转场中多次求值策略，因此 `resolve` 应保持
+无副作用，只根据输入 route 返回动画。
+
 ## 7. 导航操作的准确语义
 
 假设当前 back stack 为：

@@ -9,6 +9,11 @@
     <string name="product_list_title">精选商品</string>
     <string name="product_list_subtitle">简洁、耐用，适合每天使用</string>
     <string name="product_count">共 %1$d 件</string>
+    <string name="pull_refresh_pulling">下拉刷新</string>
+    <string name="pull_refresh_ready">释放刷新</string>
+    <string name="pull_refresh_refreshing">正在刷新</string>
+    <string name="pull_refresh_complete">刷新完成</string>
+    <string name="pull_refresh_failed">刷新失败</string>
     <string name="active_login">主动登录</string>
     <string name="logout">退出登录</string>
     <string name="product_price">¥%1$d</string>

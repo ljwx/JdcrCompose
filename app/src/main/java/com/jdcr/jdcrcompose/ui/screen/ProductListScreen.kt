@@ -32,6 +32,10 @@ import com.jdcr.jdcrcompose.R
 import com.jdcr.jdcrcompose.data.Product
 import com.jdcr.jdcrcompose.ui.component.BrandMark
 import com.jdcr.jdcrcompose.ui.component.ProductArtwork
+import com.jdcr.jdcrpullrefresh.JdcrClassicHeader
+import com.jdcr.jdcrpullrefresh.JdcrPullRefresh
+import com.jdcr.jdcrpullrefresh.PullRefreshHeaderLabels
+import com.jdcr.jdcrpullrefresh.rememberPullRefreshState
 
 @Composable
 fun ProductListScreen(
@@ -40,77 +44,98 @@ fun ProductListScreen(
     onProductClick: (Long) -> Unit,
     onActiveLogin: () -> Unit,
     onLogout: () -> Unit,
+    onRefresh: suspend () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val pullRefreshState = rememberPullRefreshState(
+        onRefresh = { onRefresh() },
+    )
+    val headerLabels = PullRefreshHeaderLabels(
+        pulling = stringResource(R.string.pull_refresh_pulling),
+        ready = stringResource(R.string.pull_refresh_ready),
+        refreshing = stringResource(R.string.pull_refresh_refreshing),
+        complete = stringResource(R.string.pull_refresh_complete),
+        failed = stringResource(R.string.pull_refresh_failed),
+    )
+
     Surface(modifier = modifier.fillMaxSize()) {
-        LazyColumn(
+        JdcrPullRefresh(
+            state = pullRefreshState,
             modifier = Modifier
                 .fillMaxSize()
                 .windowInsetsPadding(WindowInsets.safeDrawing),
-            contentPadding = PaddingValues(
-                start = 20.dp,
-                top = 20.dp,
-                end = 20.dp,
-                bottom = 32.dp,
-            ),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            header = {
+                JdcrClassicHeader(labels = headerLabels)
+            },
         ) {
-            item(key = "header") {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    BrandMark()
-                    TextButton(
-                        onClick = if (isLoggedIn) onLogout else onActiveLogin,
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                overscrollEffect = null,
+                contentPadding = PaddingValues(
+                    start = 20.dp,
+                    top = 20.dp,
+                    end = 20.dp,
+                    bottom = 32.dp,
+                ),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                item(key = "header") {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        BrandMark()
+                        TextButton(
+                            onClick = if (isLoggedIn) onLogout else onActiveLogin,
+                        ) {
+                            Text(
+                                text = stringResource(
+                                    if (isLoggedIn) R.string.logout else R.string.active_login,
+                                ),
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(42.dp))
+                    Text(
+                        text = stringResource(R.string.collection_label),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(R.string.product_list_title),
+                        style = MaterialTheme.typography.headlineLarge,
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = stringResource(
-                                if (isLoggedIn) R.string.logout else R.string.active_login,
-                            ),
+                            text = stringResource(R.string.product_list_subtitle),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.66f),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            text = stringResource(R.string.product_count, products.size),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
+                    Spacer(Modifier.height(12.dp))
                 }
-                Spacer(Modifier.height(42.dp))
-                Text(
-                    text = stringResource(R.string.collection_label),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.labelLarge,
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = stringResource(R.string.product_list_title),
-                    style = MaterialTheme.typography.headlineLarge,
-                )
-                Spacer(Modifier.height(6.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = stringResource(R.string.product_list_subtitle),
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.66f),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Text(
-                        text = stringResource(R.string.product_count, products.size),
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-                Spacer(Modifier.height(12.dp))
-            }
 
-            items(
-                items = products,
-                key = Product::id,
-            ) { product ->
-                ProductListItem(
-                    product = product,
-                    onClick = { onProductClick(product.id) },
-                )
+                items(
+                    items = products,
+                    key = Product::id,
+                ) { product ->
+                    ProductListItem(
+                        product = product,
+                        onClick = { onProductClick(product.id) },
+                    )
+                }
             }
         }
     }

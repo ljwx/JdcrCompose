@@ -46,3 +46,4 @@ dependencyResolutionManagement {
 rootProject.name = "JdcrCompose"
 include(":app")
 include(":jdcrnavigation")
+include(":jdcrpullrefresh")

@@ -120,6 +120,7 @@ fun DemoApp(
                     )
                 },
                 onLogout = appViewModel::logout,
+                onRefresh = appViewModel::refreshProducts,
             )
         }
 

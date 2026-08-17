@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.jdcr.jdcrcompose.auth.DemoAuthService
 import com.jdcr.jdcrcompose.navigation.DemoSplashInitializer
 import com.jdcr.navigation.command.ExternalNavigationDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class DemoAppViewModel : ViewModel() {
@@ -26,5 +27,9 @@ class DemoAppViewModel : ViewModel() {
 
     fun expireSession() {
         authService.expireSession()
+    }
+
+    suspend fun refreshProducts() {
+        delay(2_000L)
     }
 }

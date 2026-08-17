@@ -55,6 +55,7 @@ kotlin {
 
 dependencies {
     implementation(project(":jdcrnavigation"))
+    implementation(project(":jdcrpullrefresh"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.ui)

@@ -10,13 +10,11 @@ import com.jdcr.jdcrcompose.data.PRODUCT_PAGE_SIZE
 import com.jdcr.jdcrcompose.data.ProductCatalog
 import com.jdcr.jdcrcompose.data.ProductPagingSource
 import com.jdcr.jdcrcompose.navigation.DemoSplashInitializer
-import com.jdcr.navigation.command.ExternalNavigationDispatcher
 import kotlinx.coroutines.launch
 
 class DemoAppViewModel : ViewModel() {
     val authService = DemoAuthService()
     val splashInitializer = DemoSplashInitializer()
-    val externalNavigationDispatcher = ExternalNavigationDispatcher()
     val products = Pager(
         config = PagingConfig(
             pageSize = PRODUCT_PAGE_SIZE,

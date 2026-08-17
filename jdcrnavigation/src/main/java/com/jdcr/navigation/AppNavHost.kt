@@ -37,7 +37,7 @@ typealias AppNavPredictivePopTransitionSpec =
 fun AppNavHost(
     startRoute: BaseAppRoute,
     savedStateConfiguration: SavedStateConfiguration,
-    externalDispatcher: ExternalNavigationDispatcher,
+    externalDispatcher: ExternalNavigationDispatcher? = null,
     interceptors: List<NavigationInterceptor> = emptyList(),
     backStackGuard: BackStackGuard = {
         BackStackGuardResult.Allow
@@ -91,7 +91,7 @@ fun AppNavHost(
     }
 
     LaunchedEffect(externalDispatcher, navigator) {
-        externalDispatcher.commands.collect { command ->
+        externalDispatcher?.commands?.collect { command ->
             when (command) {
                 is ExternalNavigationCommand.Navigate ->
                     navigator.navigate(command.route, command.singleTop)

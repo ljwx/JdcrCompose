@@ -18,12 +18,12 @@ interface AppNavigator {
 
 class DefaultAppNavigator(
     private val backStack: NavBackStack<NavKey>,
-    private val interceptors: List<NavigationInterceptor>
+    private val interceptors: List<NavigationInterceptor>,
 ) : AppNavigator {
 
     private fun resolve(route: BaseAppRoute): BaseAppRoute {
         return interceptors.fold(route) { current, interceptor ->
-                interceptor.intercept(current)
+            interceptor.intercept(current)
         }
     }
 
@@ -58,12 +58,12 @@ class DefaultAppNavigator(
     override fun popTo(route: BaseAppRoute, inclusive: Boolean) {
         val index = backStack.indexOfLast { it == route }
         if (index < 0) return
-        val targetSize = if (inclusive) index else index + 1
+        // NavDisplay 不接受空栈，根页面始终保留。
+        val targetSize = (if (inclusive) index else index + 1).coerceAtLeast(1)
         while (backStack.size > targetSize) {
             backStack.removeAt(backStack.lastIndex)
         }
     }
-
 }
 
 val LocalAppNavigator = staticCompositionLocalOf<AppNavigator> {

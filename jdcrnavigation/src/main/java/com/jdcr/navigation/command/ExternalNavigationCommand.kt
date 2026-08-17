@@ -4,7 +4,7 @@ import com.jdcr.navigation.route.BaseAppRoute
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 
-sealed interface ExternalNavigationCommand {
+internal sealed interface ExternalNavigationCommand {
 
     data class Navigate(val route: BaseAppRoute, val singleTop: Boolean = true) :
         ExternalNavigationCommand
@@ -43,5 +43,4 @@ class ExternalNavigationDispatcher {
     fun pop(route: BaseAppRoute, inclusive: Boolean = false) {
         channel.trySend(ExternalNavigationCommand.Pop(route, inclusive))
     }
-
 }

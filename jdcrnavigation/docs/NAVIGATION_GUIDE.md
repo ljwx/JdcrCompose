@@ -295,9 +295,7 @@ NavKey + AppRoute.AccountCenter     -> AccountCenter.serializer()
 - back stack 是 `NavBackStack<NavKey>`。
 - `Login.returnTo` 是 `NavKey?`。
 
-因此只注册 `polymorphic(BaseAppRoute::class)` 不能满足当前恢复链路。当前架构应该统一注册到 `NavKey::class` 下。
-
-如果未来把整个库改为 `NavBackStack<BaseAppRoute>`，并把 `returnTo` 改成 `BaseAppRoute?`，才可以统一改用 `BaseAppRoute::class`。这属于协议级变更，不能只改一行注册代码。
+因此只注册 `polymorphic(BaseAppRoute::class)` 不能满足恢复链路。App 应把所有可能进入 back stack 或作为 `returnTo` 的具体路由注册到 `NavKey::class` 下。
 
 ### 5.5 构造 SavedStateConfiguration
 
@@ -336,9 +334,6 @@ fun AppRoot(
     authService: AuthService,
     initializer: SplashUiInitializer,
 ) {
-    val externalDispatcher = remember {
-        ExternalNavigationDispatcher()
-    }
     val authInterceptor = remember(authService) {
         AuthNavigationInterceptor(authService) {
             LoginOptions(initialMethod = LoginMethod.Account)
@@ -366,7 +361,6 @@ fun AppRoot(
     AppNavHost(
         startRoute = CommonRoute.Splash,
         savedStateConfiguration = navSavedStateConfiguration,
-        externalDispatcher = externalDispatcher,
         interceptors = listOf(authInterceptor),
         backStackGuard = { backStack ->
             evaluateBackStack(
@@ -410,6 +404,9 @@ fun AppRoot(
     }
 }
 ```
+
+普通 App 不需要创建 `ExternalNavigationDispatcher`。只有通知、深链或 Activity 回调等
+Composition 外部入口确实需要发起导航时，才创建并传给 `AppNavHost`。
 
 `DestinationRegistry` 的 receiver 是 `EntryProviderScope<NavKey>`，参数是 `AppNavigator`。这样调用处可以同时使用：
 
@@ -550,6 +547,9 @@ navigator.popTo(AppRoute.ArticleList)
 [Home, ArticleList, ArticleDetail(1)]
 => [Home]
 ```
+
+根 route 是唯一例外。`popTo(Home, inclusive = true)` 仍会保留 `Home`，因为
+`NavDisplay` 不接受空 back stack。
 
 `popTo` 只查找已经存在的 route，不会执行拦截器；`back` 同样不会执行拦截器。只有产生新目标的 `navigate`、`replace` 和 `resetTo` 才执行拦截器。
 
@@ -881,14 +881,14 @@ Composable 页面优先直接使用 `AppNavigator`。`ExternalNavigationDispatch
 - App 级协调器产生一次性导航命令。
 
 ```kotlin
-externalDispatcher.navigate(AppRoute.ArticleDetail(articleId = 1001))
-externalDispatcher.reset(AppRoute.Home)
-externalDispatcher.back()
+externalDispatcher.navigate(
+    AppRoute.ArticleDetail(articleId = 1001),
+)
 ```
 
-内部使用 `Channel.UNLIMITED`，命令会按发送顺序由 `AppNavHost` 收集。使用时注意：
+`AppNavHost` 的 `externalDispatcher` 参数默认是 `null`。传入后，内部使用 `Channel.UNLIMITED` 按发送顺序收集命令。外部导航应是低频的一次性事件，高频数据流不应进入这个通道。使用时注意：
 
-- Dispatcher 应该拥有稳定生命周期，通常由 Activity、Application scope 或 DI 容器持有。
+- Dispatcher 生命周期应与导航 Host 一致，通常由 Activity 或对应 DI scope 持有。
 - 不要在每次重组时创建新实例。
 - 它是进程内命令通道，不会持久化命令。
 - 不要把它扩展成所有业务事件的全局 event bus。
@@ -902,7 +902,7 @@ externalDispatcher.back()
 | --- | --- | --- |
 | Compose Runtime | `api` | 公共 API 暴露 `@Composable`、`@Immutable` 等类型/注解 |
 | Navigation3 Runtime | `api` | 公共 API 暴露 `NavKey`、`NavBackStack`、`EntryProviderScope` |
-| Navigation3 UI | `implementation` | 只有 `AppNavHost` 内部使用 `NavDisplay` |
+| Navigation3 UI | `api` | 公共转场类型暴露 `Scene`，Host 内部使用 `NavDisplay` |
 | SavedState | `api` | `AppNavHost` 公共参数是 `SavedStateConfiguration` |
 | Serialization Core | `api` | 公共 route 和 `SerializersModule` 需要它，生成 serializer 也依赖它 |
 | Coroutines Core | `api` | `AuthService.sessionState` 在公共 API 中暴露 `StateFlow` |
@@ -932,7 +932,7 @@ externalDispatcher.back()
 
 ### 13.3 为什么移除这些依赖
 
-从库模块移除了：
+从发布所需的主实现依赖中移除了：
 
 - `androidx.compose.ui:ui`
 - `androidx.compose.foundation:foundation`
@@ -940,7 +940,7 @@ externalDispatcher.back()
 - `kotlinx-serialization-json`
 - Compose BOM
 
-源码没有直接导入前三个 UI 依赖，也没有使用 JSON 格式。Navigation3 UI 仍会传递引入它自身运行所需的 Compose UI/Animation/Foundation，这不代表本库应该把它们重复声明成直接依赖。
+主源码没有直接导入前三个 UI 依赖，也没有使用 JSON 格式，因此没有必要直接声明这些依赖。Navigation3 UI 仍会传递引入它自身运行所需的 Compose UI/Animation/Foundation，这不代表本库应该把它们重复声明成直接依赖。
 
 Compose BOM 保留在 App 模块，用于协调 App 自己选择的 Compose UI 库；`jdcrnavigation` 只显式声明自己公共 API 所需的 Compose Runtime 版本。
 
@@ -1098,6 +1098,7 @@ Navigator
 - 根页面不能被 `back()` 弹空。
 - `singleTop` 对相同和不同参数 route 的行为。
 - `replace`、`resetTo`、`popTo(inclusive)` 的列表结果。
+- `popTo(root, inclusive = true)` 仍保留根 route。
 - 多个 interceptor 的执行顺序。
 - `popTo` 找不到目标时保持不变。
 

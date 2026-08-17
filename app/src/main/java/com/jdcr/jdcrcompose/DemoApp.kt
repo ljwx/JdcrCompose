@@ -75,7 +75,6 @@ fun DemoApp(
     AppNavHost(
         startRoute = CommonRoute.Splash,
         savedStateConfiguration = demoSavedStateConfiguration,
-        externalDispatcher = appViewModel.externalNavigationDispatcher,
         interceptors = interceptors,
         backStackGuard = { backStack ->
             evaluateDemoBackStack(

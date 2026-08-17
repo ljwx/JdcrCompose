@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    `maven-publish`
 }
 
 android {
@@ -26,7 +27,7 @@ kotlin {
 }
 
 dependencies {
-    api(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.androidx.compose.bom))
     api(libs.androidx.compose.runtime)
     api(libs.androidx.compose.animation.core)
     api(libs.androidx.compose.ui)
@@ -36,4 +37,18 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+
+                groupId = "com.github.jdcr"
+                artifactId = "jdcrpullrefresh"
+                version = "1.0.0-SNAPSHOT"
+            }
+        }
+    }
 }

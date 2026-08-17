@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Velocity
 
-/** Values a Header can use to render its own pull and refresh animation. */
+/** 自定义 Header 渲染下拉和刷新动画时可读取的数据。 */
 @Stable
 class PullRefreshHeaderScope internal constructor(
     private val state: PullRefreshState,
@@ -48,12 +48,11 @@ class PullRefreshHeaderScope internal constructor(
 }
 
 /**
- * A SmartRefresh-style pull-to-refresh container for Compose scrollables.
+ * 面向 Compose 滚动容器的 SmartRefresh 风格下拉刷新组件。
  *
- * Put a `LazyColumn`, `verticalScroll` content, or another vertical nested-scroll child in
- * [content]. The child scrolls normally; once it is at the top, this container applies a damped
- * pull, moves the content and reveals [header] together, and starts the callback after release
- * past the threshold.
+ * 可将 `LazyColumn`、使用 `verticalScroll` 的内容或其他纵向嵌套滚动子级放入 [content]。
+ * 子级正常滚动到顶部后，容器会对下拉施加阻尼，同时移动内容并展示 [header]；超过阈值
+ * 后松手即可触发刷新回调。
  */
 @Composable
 fun JdcrPullRefresh(

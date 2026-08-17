@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.jdcr.jdcrcompose.data.ProductCatalog
 import com.jdcr.jdcrcompose.navigation.DemoRoute
 import com.jdcr.jdcrcompose.navigation.demoSavedStateConfiguration
@@ -103,8 +104,9 @@ fun DemoApp(
         )
 
         entry<DemoRoute.Home> {
+            val products = appViewModel.products.collectAsLazyPagingItems()
             ProductListScreen(
-                products = ProductCatalog.products,
+                products = products,
                 isLoggedIn = sessionState is AuthSessionState.Authenticated,
                 onProductClick = { productId ->
                     navigator.navigate(DemoRoute.ProductDetail(productId))
@@ -120,7 +122,6 @@ fun DemoApp(
                     )
                 },
                 onLogout = appViewModel::logout,
-                onRefresh = appViewModel::refreshProducts,
             )
         }
 

@@ -8,7 +8,7 @@ vertical scrolling first, then takes over the unconsumed downward drag at the to
 ```kotlin
 val refreshState = rememberPullRefreshState(
     onRefresh = {
-        viewModel.refreshProducts() // suspend until the real refresh is complete
+        viewModel.refreshProducts() // 挂起等待真实刷新完成
     },
     onRefreshError = logger::record,
 )
@@ -21,7 +21,7 @@ JdcrPullRefresh(
         modifier = Modifier.fillMaxSize(),
         overscrollEffect = null,
     ) {
-        // items
+        // 列表项
     }
 }
 ```
@@ -56,7 +56,7 @@ JdcrPullRefresh(
     },
 ) {
     LazyColumn(Modifier.fillMaxSize()) {
-        // items
+        // 列表项
     }
 }
 ```

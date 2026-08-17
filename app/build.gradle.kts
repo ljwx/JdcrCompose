@@ -56,6 +56,7 @@ kotlin {
 dependencies {
     implementation(project(":jdcrnavigation"))
     implementation(project(":jdcrpullrefresh"))
+    implementation(project(":jdcrloadmore"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.ui)
@@ -66,4 +67,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.paging.compose)
+    testImplementation(libs.junit)
 }

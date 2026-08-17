@@ -1,4 +1,4 @@
-package com.jdcr.jdcrpullrefresh
+package com.jdcr.jdcrloadmore
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -15,6 +15,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // 获取被测试库的 Context。
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.jdcr.jdcrpullrefresh.test", appContext.packageName)
+        assertEquals("com.jdcr.jdcrloadmore.test", appContext.packageName)
     }
 }

@@ -47,3 +47,4 @@ rootProject.name = "JdcrCompose"
 include(":app")
 include(":jdcrnavigation")
 include(":jdcrpullrefresh")
+include(":jdcrloadmore")

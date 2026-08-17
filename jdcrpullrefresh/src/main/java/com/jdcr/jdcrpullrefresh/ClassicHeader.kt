@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.unit.dp
 
-/** Text labels for the built-in classic Header. */
+/** 内置经典 Header 使用的文字。 */
 @Immutable
 data class PullRefreshHeaderLabels(
     val pulling: String = "Pull to refresh",
@@ -35,10 +35,10 @@ data class PullRefreshHeaderLabels(
 )
 
 /**
- * A small, neutral Header inspired by SmartRefreshLayout's ClassicsHeader.
+ * 一个参考 SmartRefreshLayout ClassicsHeader 的简洁中性 Header。
  *
- * It is intentionally just a convenience default. A product-specific Header can use the same
- * [PullRefreshHeaderScope] and replace this slot without changing the refresh mechanics.
+ * 它只是便于直接使用的默认实现。业务可以读取同一个 [PullRefreshHeaderScope] 并替换该插槽，
+ * 不需要改动下拉刷新的手势和状态逻辑。
  */
 @Composable
 fun PullRefreshHeaderScope.JdcrClassicHeader(

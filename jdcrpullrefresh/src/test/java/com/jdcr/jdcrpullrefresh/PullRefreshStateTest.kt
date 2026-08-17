@@ -57,7 +57,7 @@ class PullRefreshStateTest {
     @Test
     fun upwardDragFirstClosesHeaderAndReturnsOnlyTheRemainder() {
         val state = newState()
-        state.consumeDownward(160f) // 80 px visible pull
+        state.consumeDownward(160f) // 对应 80 像素的可见下拉距离
 
         assertEquals(-160f, state.consumePreScroll(-200f), 0.001f)
         assertEquals(PullRefreshStatus.Idle, state.status)

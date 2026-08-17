@@ -23,7 +23,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 
-/** The lifecycle state exposed to a custom pull-to-refresh header. */
+/** 提供给自定义下拉刷新 Header 的生命周期状态。 */
 enum class PullRefreshStatus {
     Idle,
     Pulling,
@@ -33,28 +33,27 @@ enum class PullRefreshStatus {
     RefreshFailed,
 }
 
-/** The result shown briefly after the refresh callback completes. */
+/** 刷新回调结束后短暂展示的结果。 */
 enum class PullRefreshResult {
     Success,
     Failure,
 }
 
-/** Completion controls available inside the suspend refresh callback. */
+/** 挂起刷新回调中可用的完成控制作用域。 */
 class PullRefreshCallbackScope internal constructor(
     private val onFinish: (PullRefreshResult) -> Unit,
 ) {
-    /** Completes the current refresh with an explicit result. */
+    /** 使用指定结果结束当前刷新。 */
     fun finish(result: PullRefreshResult = PullRefreshResult.Success) {
         onFinish(result)
     }
 }
 
 /**
- * State for [JdcrPullRefresh].
+ * [JdcrPullRefresh] 使用的状态对象。
  *
- * A state is intentionally independent from a particular scrollable. Attach it to a
- * [JdcrPullRefresh] once, and use [refresh] or [finishRefresh] when a programmatic flow needs
- * to control it.
+ * 该状态有意与具体滚动容器解耦。将它关联到一个 [JdcrPullRefresh] 后，业务流程可通过
+ * [refresh] 或 [finishRefresh] 主动控制刷新。
  */
 @Stable
 class PullRefreshState internal constructor(
@@ -83,41 +82,39 @@ class PullRefreshState internal constructor(
     private var containerHeightPx = 0f
     private var offsetPx by mutableFloatStateOf(0f)
 
-    /** Current lifecycle state. */
+    /** 当前生命周期状态。 */
     var status: PullRefreshStatus by mutableStateOf(PullRefreshStatus.Idle)
         private set
 
-    /** Whether the refresh callback is currently running. */
+    /** 刷新回调当前是否正在执行。 */
     val isRefreshing: Boolean
         get() = status == PullRefreshStatus.Refreshing
 
-    /** Current visible offset of the content and Header, in pixels. */
+    /** 内容与 Header 当前可见偏移量，单位为像素。 */
     internal val contentOffsetPx: Float
         get() = offsetPx
 
-    /** Current visible pull distance, in pixels. */
+    /** 当前可见下拉距离，单位为像素。 */
     internal val indicatorOffsetPx: Float
         get() = offsetPx
 
-    /** Pull distance ratio. A value of 1 reaches the threshold; over-pull can exceed 1. */
+    /** 下拉距离比例，达到阈值时为 1，继续下拉时可以大于 1。 */
     val progress: Float
         get() = if (triggerDistancePx == 0f) 0f else offsetPx / triggerDistancePx
 
-    /** Pull distance in dp for custom headers. */
+    /** 提供给自定义 Header 的 dp 下拉距离。 */
     internal fun pullDistance(density: Density): Dp = with(density) { offsetPx.toDp() }
 
     /**
-     * Starts a refresh from code. The same callback and completion behavior as a gesture refresh
-     * are used. Calling this while refreshing is a no-op.
+     * 通过代码主动开始刷新，使用与手势刷新相同的回调和结束逻辑。刷新期间重复调用不会生效。
      */
     fun refresh() {
         scope.launch { startRefresh() }
     }
 
     /**
-     * Completes a refresh started by this state. Normally the suspend callback is enough and the
-     * state completes automatically; this method is useful when an integration owns completion
-     * itself or wants to report a failure explicitly.
+     * 结束由该状态启动的刷新。通常挂起回调返回后会自动结束；当接入方自行控制完成时机，
+     * 或需要明确上报失败时，可以调用该方法。
      */
     fun finishRefresh(result: PullRefreshResult = PullRefreshResult.Success) {
         requestFinish(result, refreshGeneration)
@@ -161,7 +158,7 @@ class PullRefreshState internal constructor(
             if (velocityY < 0f && indicatorOffsetPx > 0f) {
                 settleJob?.cancel()
                 settleJob = scope.launch { animateOffsetTo(0f) }
-                // Let the child keep the upward velocity while the Header closes.
+                // Header 收起时把向上的速度继续交给子级，避免列表滚动被截断。
                 return false
             }
 
@@ -335,12 +332,11 @@ class PullRefreshState internal constructor(
 }
 
 /**
- * Creates state remembered across recompositions.
+ * 创建一个可跨重组保持的下拉刷新状态。
  *
- * `onRefresh` is suspend so callers can keep the real request in one place. Once it returns, the
- * Header enters the complete state and then rebounds closed; an exception is shown as failure and
- * delivered to `onRefreshError`. By default, content remains scrollable while refreshing and an
- * upward gesture can close the Header without cancelling the refresh task.
+ * `onRefresh` 是挂起回调，调用方可以在其中直接执行真实请求。回调返回后，Header 会进入
+ * 完成状态并回弹收起；回调抛出异常时会展示失败状态，并将异常传给 `onRefreshError`。
+ * 默认情况下刷新期间内容仍可滚动，向上手势可以收起 Header，但不会取消刷新任务。
  */
 @Composable
 fun rememberPullRefreshState(

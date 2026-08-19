@@ -1,6 +1,7 @@
 package com.jdcr.jdcrloadmore
 
 import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 
 /** 加载更多 Footer 可以展示的界面状态。 */
 sealed interface LoadMoreUiState {
@@ -16,6 +17,19 @@ sealed interface LoadMoreUiState {
     /** 已到达数据末尾。 */
     data object End : LoadMoreUiState
 }
+
+/**
+ * 将 Paging 3 的追加状态转换为通用 Footer 状态。
+ *
+ * 该方法不依赖具体 Lazy 容器，可用于 `LazyColumn`、网格、瀑布流或业务自定义布局。
+ */
+fun LazyPagingItems<*>.loadMoreUiState(
+    showEndOfPagination: Boolean = true,
+): LoadMoreUiState = mapAppendLoadState(
+    appendLoadState = loadState.append,
+    itemCount = itemCount,
+    showEndOfPagination = showEndOfPagination,
+)
 
 internal fun mapAppendLoadState(
     appendLoadState: LoadState,

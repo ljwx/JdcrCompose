@@ -37,6 +37,31 @@ LazyColumn {
 访问 `products[index]` 时，Paging 3 会根据 `prefetchDistance` 自动判断是否追加下一页。不要在
 Footer 中再次调用页码接口，否则会形成两套分页状态。
 
+## 在网格或自定义容器中使用
+
+`pagingLoadMoreFooter()` 是 `LazyColumn` 的便捷扩展。其他容器可以使用同一套状态转换，
+不需要在业务层重复判断 `LoadState`：
+
+```kotlin
+LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Adaptive(156.dp)) {
+    items(
+        count = products.itemCount,
+        key = products.itemKey(Product::id),
+    ) { index ->
+        products[index]?.let { ProductItem(it) }
+    }
+
+    item(span = StaggeredGridItemSpan.FullLine) {
+        JdcrLoadMoreFooter(
+            state = products.loadMoreUiState(),
+            onRetry = products::retry,
+        )
+    }
+}
+```
+
+`loadMoreUiState()` 只转换 Paging 状态，因此也可以用于普通网格或业务自己的 Footer 布局。
+
 ## 自定义 Footer
 
 ```kotlin

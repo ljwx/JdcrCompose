@@ -784,17 +784,23 @@ data class CommonPages(
 
 ```kotlin
 @Serializable
-enum class LoginMethod {
-    @SerialName("phone") Phone,
-    @SerialName("account") Account,
-    @SerialName("social") Social,
+@JvmInline
+value class LoginMethod(val value: String) {
+    companion object {
+        val Phone = LoginMethod("phone")
+        val Account = LoginMethod("account")
+        val Social = LoginMethod("social")
+    }
 }
 
 @Serializable
-enum class LoginReason {
-    @SerialName("user_initiated") UserInitiated,
-    @SerialName("protected_route") ProtectedRoute,
-    @SerialName("session_expired") SessionExpired,
+@JvmInline
+value class LoginReason(val value: String) {
+    companion object {
+        val UserInitiated = LoginReason("user_initiated")
+        val ProtectedRoute = LoginReason("protected_route")
+        val SessionExpired = LoginReason("session_expired")
+    }
 }
 
 @Serializable
@@ -804,13 +810,22 @@ data class LoginOptions(
 )
 ```
 
-使用数据类而不是继续给 `Login` 增加零散参数，可以让登录配置保持一个明确的整体。使用枚举表示登录方式和进入原因，也比多个互相排斥的 Boolean 更不容易产生矛盾组合。
+使用数据类而不是继续给 `Login` 增加零散参数，可以让登录配置保持一个明确的整体。使用值类型表示登录方式和进入原因，也比多个互相排斥的 Boolean 更不容易产生矛盾组合。
 
-枚举值上的 `@SerialName` 固定了保存状态中的名称，使序列化格式不依赖 Kotlin 枚举常量的拼写。已经发布后应把这些名称视为持久化协议，不要随意修改，否则旧 back stack 可能无法恢复。
+内置值覆盖手机号、账号、社交登录以及常见进入原因。App 也可以使用稳定的短字符串扩展自己的方式和原因：
+
+```kotlin
+val Passkey = LoginMethod("passkey")
+val AccountBinding = LoginReason("account_binding")
+```
+
+这些字符串会随 route 保存，应当视为持久化协议，不要使用临时值或敏感信息。
 
 `initialMethod` 只表示页面第一次显示时选中的登录方式。用户进入页面后切换手机号、账号或社交登录，属于页面自身的 UI 状态，不应该反向修改 route。`reason` 用于选择场景文案、埋点或产品策略；真正决定登录成功后去哪儿的是 `returnTo`，不要用 `reason` 重复实现导航分支。
 
-因为 `LoginOptions` 是 route 的一部分，所以它必须保持轻量、不可变且可序列化。适合放入枚举、Boolean、数字和短字符串；不要放密码、验证码、token、Context、Repository、回调或大型业务对象。新增字段时应提供合理默认值，使旧调用点和旧保存状态仍有明确行为。
+因为 `LoginOptions` 是 route 的一部分，所以它必须保持轻量、不可变且可序列化。适合放入值类型、Boolean、数字和短字符串；不要放密码、验证码、token、Context、Repository、回调或大型业务对象。新增字段时应提供合理默认值，使旧调用点和旧保存状态仍有明确行为。
+
+`AuthLoginType` 只在用户提交登录时传给 `AuthService`，不会进入 route。除了内置的账号、短信和社交登录，App 可以直接实现该接口传递自定义登录请求。
 
 主动打开登录页时可以使用默认配置，也可以显式说明入口：
 

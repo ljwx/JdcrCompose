@@ -95,11 +95,7 @@ fun LazyListScope.pagingLoadMoreFooter(
         key = key,
         contentType = LoadMoreFooterContentType,
     ) {
-        val state = mapAppendLoadState(
-            appendLoadState = pagingItems.loadState.append,
-            itemCount = pagingItems.itemCount,
-            showEndOfPagination = showEndOfPagination,
-        )
+        val state = pagingItems.loadMoreUiState(showEndOfPagination)
         JdcrLoadMoreFooter(
             state = state,
             onRetry = pagingItems::retry,

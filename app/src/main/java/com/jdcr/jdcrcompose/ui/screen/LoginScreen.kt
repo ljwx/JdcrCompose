@@ -112,7 +112,7 @@ fun LoginScreen(
                     text = when (options.reason) {
                         LoginReason.ProtectedRoute -> stringResource(R.string.login_for_protected_route)
                         LoginReason.SessionExpired -> stringResource(R.string.login_for_session_expired)
-                        LoginReason.UserInitiated -> stringResource(R.string.login_default_message)
+                        else -> stringResource(R.string.login_default_message)
                     },
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.68f),
                     style = MaterialTheme.typography.bodyLarge,

@@ -28,4 +28,6 @@ AppNavHost(
 
 页面内优先使用 `AppNavigator`。只有通知、深链或 Activity 回调等 Composition 外部入口需要导航时，才创建并传入 `ExternalNavigationDispatcher`。
 
+公共登录流程内置账号、短信和社交登录数据，也允许 App 通过 `AuthLoginType`、`LoginMethod` 和 `LoginReason` 扩展自己的登录方式与场景。
+
 路由定义、多态序列化、登录拦截、返回栈保护、转场策略和完整示例见 [Navigation 3 与 JdcrNavigation 设计和使用指南](docs/NAVIGATION_GUIDE.md)。

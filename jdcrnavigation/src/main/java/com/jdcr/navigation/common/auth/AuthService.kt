@@ -2,7 +2,10 @@ package com.jdcr.navigation.common.auth
 
 import kotlinx.coroutines.flow.StateFlow
 
-sealed interface AuthLoginType {
+/**
+ * 登录请求数据。库提供常用实现，App 也可以实现该接口接入通行密钥、扫码等自定义方式。
+ */
+interface AuthLoginType {
     data class Account(val account: String, val password: String) : AuthLoginType
     data class Social(val token: String) : AuthLoginType
     data class SMS(val phoneNumber: String, val code: String) : AuthLoginType
